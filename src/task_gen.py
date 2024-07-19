@@ -11,14 +11,15 @@ smtp_server = "smtp-mail.outlook.com"
 smtp_port = 587
 
 
-def task_email(r_email, name, tasks):
+def task_email(r_email, name, task):
     """creating the emails to send"""
     msg = EmailMessage()
-    msg["Subject"] = "GENCON TASKS"
+    msg["Subject"] = "GENCON TASKS - DEMO"
     msg["From"] = email_address
     msg["To"] = r_email
+    newline = "\n\n\t"  # escapes not allowed in f-strings
     msg.set_content(
-        f"Hello {name}, here are your tasks for the day.\n {tasks}\n\n Have a nice day!"
+        f"Hello {name}, here are your tasks for the day.\n\n\t{newline.join(f'{i[0]}-> {i[1]}' for i in task)}\n\nHave a nice day!"
     )
     # with open("attachment.txt", "rb") as f:
     #    file_data = f.read()
@@ -39,12 +40,13 @@ print(players)
 
 # import task lists
 with open("src/tasks.csv", mode="r") as file:
-    tasks = list(csv.reader(file))
-print(tasks)
+    tasks = list(csv.reader(file, delimiter=";"))
+# print(tasks)
 
 # randomize task and assign to player
 for i in players:
     random.shuffle(tasks)
-    todo = tasks
+    todo = tasks[:5]
     task_email(i[1], i[0], todo)
+    # print(todo)
 print("Done")
