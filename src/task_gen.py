@@ -1,52 +1,64 @@
+"""Functions used to send task emails to players of the GenCon Versus game."""
+
 import csv
 import random
-import os.path
 import smtplib
 from email.message import EmailMessage
 
-# email account info
-email_address = "dungeonmasterBU@hotmail.com"
-email_password = "12ampcurrent"
-smtp_server = "smtp-mail.outlook.com"
-smtp_port = 587
+# email acCOUNT info
+EMAIL_ADDRESS = "dungeonmasterBU@hotmail.com"
+EMAIL_PASSWORD = "12ampcurrent"
+SMTP_SERVER = "smtp-mail.outlook.com"
+SMTP_PORT = 587
 
 
-def task_email(r_email, name, task):
+def task_email(r_email, name, task, team):
     """creating the emails to send"""
     msg = EmailMessage()
-    msg["Subject"] = "GENCON TASKS - DEMO"
-    msg["From"] = email_address
+    msg["Subject"] = "GENCON TASKS - TESTING THE SYSTEM"
+    msg["From"] = EMAIL_ADDRESS
     msg["To"] = r_email
     newline = "\n\n\t"  # escapes not allowed in f-strings
     msg.set_content(
-        f"Hello {name}, here are your tasks for the day.\n\n\t{newline.join(f'{i[0]}-> {i[1]}' for i in task)}\n\nHave a nice day!"
+        f"Hello {name},\nYou are on team {team}.\nHere are your tasks:\n\n\t{newline.join(f'{i[0]}-> {i[1]}' for i in task)}\n\nHave a nice day!"
     )
-    # with open("attachment.txt", "rb") as f:
-    #    file_data = f.read()
-    # msg.add_attachment(
-    #    file_data, maintype="text", subtype="plain", filename="attachment.txt"
-    # )
+
     # Send email message
-    with smtplib.SMTP(smtp_server, smtp_port) as server:
+    with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
         server.starttls()
-        server.login(email_address, email_password)
+        server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
         server.send_message(msg)
 
 
-# import player lists
+# import player list
 with open("src/players.csv", mode="r") as file:
     players = list(csv.reader(file))
-print(players)
+# print(players)
 
 # import task lists
-with open("src/tasks.csv", mode="r") as file:
-    tasks = list(csv.reader(file, delimiter=";"))
-# print(tasks)
+with open("src/easy.csv", mode="r") as file:
+    easy = list(csv.reader(file, delimiter=";"))
+with open("src/medium.csv", mode="r") as file:
+    medium = list(csv.reader(file, delimiter=";"))
+with open("src/hard.csv", mode="r") as file:
+    hard = list(csv.reader(file, delimiter=";"))
+# print(easy, medium, hard)
 
 # randomize task and assign to player
+random.shuffle(players)
+COUNT = 0
 for i in players:
-    random.shuffle(tasks)
-    todo = tasks[:5]
-    task_email(i[1], i[0], todo)
+    if COUNT < len(players) // 2:
+        TEAM = "RED"
+    else:
+        TEAM = "BLUE"
+    random.shuffle(easy)
+    random.shuffle(medium)
+    random.shuffle(hard)
+    todo = easy[:][:2] + medium[:][:1] + hard[:][:1]
+    task_email(i[1], i[0], todo, TEAM)
     # print(todo)
+    i.append(TEAM)
+    COUNT += 1
 print("Done")
+print(players)
