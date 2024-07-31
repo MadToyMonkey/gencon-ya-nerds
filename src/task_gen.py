@@ -5,23 +5,38 @@ import random
 import smtplib
 from email.message import EmailMessage
 
-# email acCOUNT info
+# email account info
 EMAIL_ADDRESS = "dungeonmasterBU@hotmail.com"
 EMAIL_PASSWORD = "12ampcurrent"
 SMTP_SERVER = "smtp-mail.outlook.com"
 SMTP_PORT = 587
+EMAIL = """
+    Hello {name},
+    You are on team {team}.
+    
+    Here are your tasks:
+        {task_list}
+
+    The rules and pointing are simple. The tasks are in order -> 1, 1, 3, 5 points each.
+    A task is completed by posting a photo that encapsulates the completed task in #gencon-versus. Please include the task name as well.
+    You may challenge someone who has completed THE EXACT SAME TASK you have listed above. 
+    Once the task is completed by anyone, it cannot be completed again during this day.
+
+    Have a nice day!
+    ~ Task Master
+
+    """
 
 
-def task_email(r_email, name, task, team):
+def task_email(r_email, name, task, team, mext):
     """creating the emails to send"""
     msg = EmailMessage()
-    msg["Subject"] = "GENCON TASKS - TESTING THE SYSTEM"
+    msg["Subject"] = "GENCON TASKS - SHAUN DOES THIS MAKE SENSE"
     msg["From"] = EMAIL_ADDRESS
     msg["To"] = r_email
     newline = "\n\n\t"  # escapes not allowed in f-strings
-    msg.set_content(
-        f"Hello {name},\nYou are on team {team}.\nHere are your tasks:\n\n\t{newline.join(f'{i[0]}-> {i[1]}' for i in task)}\n\nHave a nice day!"
-    )
+    task_list = newline.join(f"{i[0]}-> {i[1]}" for i in task)
+    msg.set_content(mext.format(name=name, team=team, task_list=task_list))
 
     # Send email message
     with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
@@ -56,7 +71,7 @@ for i in players:
     random.shuffle(medium)
     random.shuffle(hard)
     todo = easy[:][:2] + medium[:][:1] + hard[:][:1]
-    task_email(i[1], i[0], todo, TEAM)
+    task_email(i[1], i[0], todo, TEAM, EMAIL)
     # print(todo)
     i.append(TEAM)
     COUNT += 1
