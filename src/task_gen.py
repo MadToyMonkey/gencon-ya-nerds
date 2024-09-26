@@ -46,8 +46,9 @@ def task_email(r_email, name, task, team, mext):
 
 
 # import player list
-with open("src/players.csv", mode="r") as file:
-    players = list(csv.reader(file))
+# with open("src/players.csv", mode="r") as file:
+#    players = list(csv.reader(file))
+players = [["md", "madderringer@gmail.com"]]
 # print(players)
 
 # import task lists
